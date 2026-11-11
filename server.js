@@ -289,7 +289,7 @@ app.post('/api/attendance', async (req, res) => {
     const connection = await pool.getConnection();
     try {
         await connection.beginTransaction();
-        const [dot] = await connection.query("INSERT INTO dot_diem_danh (ten_hoat_dong, thoi_gian, ban_kinh, vi_do, kinh_do, trang_thai) VALUES (?, ?, ?, ?, ?, 'Đang mở')", ...);
+        const [dot] = await connection.query("INSERT INTO dot_diem_danh (ten_hoat_dong, thoi_gian, ban_kinh, vi_do, kinh_do, trang_thai) VALUES (?, ?, ?, ?, ?, 'Đang mở')", [ten_hoat_dong, thoi_gian, ban_kinh, vi_do, kinh_do]);
         const [members] = await connection.query("SELECT mssv FROM thanh_vien WHERE trang_thai_hd = 'Đang hoạt động'");
         if (members.length > 0) {
             const values = members.map(m => [dot.insertId, m.mssv, 'Vắng']);
