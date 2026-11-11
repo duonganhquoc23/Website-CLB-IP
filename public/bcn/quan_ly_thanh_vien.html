@@ -67,7 +67,6 @@
         .form-control { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 6px; outline: none; }
         .form-control:focus { border-color: var(--primary); }
 
-        /* Styles cho Bảng tóm tắt cá nhân (360 độ) */
         .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 10px; }
         .summary-card { background: var(--secondary); padding: 16px; border-radius: 8px; border: 1px solid var(--border); }
         .summary-card h4 { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
@@ -162,7 +161,6 @@
         </footer>
     </div>
 
-    <!-- Modal Thêm/Sửa Thành Viên -->
     <div class="modal" id="modalForm">
         <div class="modal-content">
             <div class="modal-header">
@@ -193,7 +191,6 @@
         </div>
     </div>
 
-    <!-- Modal Hồ sơ 360 độ (Xem chi tiết) -->
     <div class="modal" id="modalSummary">
         <div class="modal-content large">
             <div class="modal-header">
@@ -227,7 +224,7 @@
     </div>
 
     <script>
-        const API_URL = 'http://localhost:3000/api/members';
+        const API_URL = '/api/members';
         let allMembers = [];
         let importedValidData = [];
         let currentEditId = null; 
@@ -239,17 +236,14 @@
                 const res = await fetch(API_URL);
                 let rawData = await res.json();
                 
-                // Thuật toán sắp xếp danh sách theo bảng chữ cái (Cột Họ Tên)
                 allMembers = rawData.sort((a, b) => {
                     const nameA = (a.ho_ten || '').trim();
                     const nameB = (b.ho_ten || '').trim();
                     
-                    // Cắt lấy phần "Tên" cuối cùng để ưu tiên so sánh chuẩn VN
                     const tenA = nameA.substring(nameA.lastIndexOf(' ') + 1);
                     const tenB = nameB.substring(nameB.lastIndexOf(' ') + 1);
                     
                     const cmp = tenA.localeCompare(tenB, 'vi');
-                    // Nếu trùng Tên, so sánh toàn bộ Họ và Tên đệm
                     if(cmp === 0) return nameA.localeCompare(nameB, 'vi');
                     return cmp;
                 });
@@ -305,7 +299,6 @@
                     if (isValid) importedValidData.push(tv);
                 }
 
-                // Xử lý Huy hiệu trạng thái
                 let statusBadge = '';
                 const status = tv.trang_thai_hd || 'Đang hoạt động';
                 if(status === 'Đang hoạt động') statusBadge = `<span class="badge" style="background:#dcfce7; color:#16a34a;">Đang hoạt động</span>`;
@@ -343,7 +336,6 @@
             });
         }
 
-        // Chức năng Xem Hồ Sơ 360 Độ
         async function viewMemberSummary(id) {
             const tv = allMembers.find(m => m.id === id);
             if (!tv) return;
@@ -363,14 +355,12 @@
             document.getElementById('modalSummary').style.display = 'flex';
 
             try {
-                // Fetch dữ liệu Ban Chủ Nhiệm
-                const resBoard = await fetch('http://localhost:3000/api/board');
+                const resBoard = await fetch('/api/board');
                 const boardData = await resBoard.json();
                 const bcnRole = boardData.find(b => parseInt(b.thanh_vien_id) === id);
                 document.getElementById('sumRole').innerText = bcnRole ? `${bcnRole.chuc_vu} - Ban ${bcnRole.ban_phu_trach}` : "Thành viên ban thường";
 
-                // Fetch dữ liệu Điểm danh
-                const resAtt = await fetch('http://localhost:3000/api/attendance');
+                const resAtt = await fetch('/api/attendance');
                 document.getElementById('sumAbsence').innerText = "Đang cập nhật (Cần đồng bộ API)";
             } catch (error) {
                 console.error(error);

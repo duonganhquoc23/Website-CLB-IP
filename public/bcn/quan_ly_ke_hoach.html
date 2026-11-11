@@ -433,10 +433,10 @@
 
         async function loadInitData() {
             try {
-                const resMem = await fetch('http://localhost:3000/api/members');
+                const resMem = await fetch('/api/members');
                 if (resMem.ok) allMembers = await resMem.json();
                 
-                const resBcn = await fetch('http://localhost:3000/api/board');
+                const resBcn = await fetch('/api/board');
                 if (resBcn.ok) allBCN = await resBcn.json();
             } catch(e) {}
             await loadPlans();
@@ -462,7 +462,7 @@
 
         async function loadPlans() {
             try {
-                const res = await fetch('http://localhost:3000/api/plans');
+                const res = await fetch('/api/plans');
                 if (res.ok) { 
                     globalPlans = await res.json(); renderPlanTable(); updateStats(); populateMediaPlanSelect(); 
                 } else throw new Error();
@@ -527,7 +527,7 @@
 
         async function deletePlan(id) {
             if(confirm("Xóa kế hoạch sẽ XÓA TOÀN BỘ dữ liệu nội dung, phân công, checklist, kinh phí liên quan. Tiếp tục?")) {
-                await fetch(`http://localhost:3000/api/plans/${id}`, { method: 'DELETE' }); loadPlans();
+                await fetch(`/api/plans/${id}`, { method: 'DELETE' }); loadPlans();
             }
         }
 
@@ -567,7 +567,6 @@
                     if(p.chuong_trinh && p.chuong_trinh.length > 0) {
                         p.chuong_trinh.forEach(ct => {
                             let st = "Chưa làm", note = ct.ghi_chu || '';
-                            // SỬA LỖI REGEX 5: Chỉ phân tách nếu khớp đúng 3 trạng thái
                             let match = note.match(/^\[(Chưa làm|Đang thực hiện|Hoàn thành)\]\s*(.*)$/);
                             if(match) { st = match[1]; note = match[2]; }
                             addAgendaRow([ct.thoi_gian, ct.noi_dung, ct.nguoi_phu_trach, st, note]);
@@ -640,7 +639,6 @@
             document.getElementById('checklistCount').innerText = `${done}/${total} hoàn thành (${pct}%)`;
         }
 
-        // SỬA LỖI 3: Khống chế nhập số âm cho phần dự trù (Thêm min="0")
         function addBudgetRow(data = []) {
             const tbody = document.querySelector(`#tblBudget tbody`);
             const tr = document.createElement('tr');
@@ -700,13 +698,12 @@
 
             const editId = document.getElementById('edit_plan_id').value;
             try {
-                await fetch(`http://localhost:3000/api/plans${editId ? '/'+editId : ''}`, { method: editId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                await fetch(`/api/plans${editId ? '/'+editId : ''}`, { method: editId ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 showCustomToast('Hoàn tất!', 'Dữ liệu kế hoạch đã được lưu lại.');
                 switchTab('tab-overview');
             } catch (error) { alert("Lỗi kết nối máy chủ"); }
         }
 
-        // ================= TAB 3: TRUYỀN THÔNG =================
         function toggleMediaKhac(val) { document.getElementById('m_ke_hoach_khac').style.display = (val === 'Khác') ? 'block' : 'none'; }
 
         function populateMediaPlanSelect() {
@@ -725,7 +722,7 @@
 
         async function loadMedia() {
             try {
-                const res = await fetch('http://localhost:3000/api/communications');
+                const res = await fetch('/api/communications');
                 if (res.ok) { globalMedia = await res.json(); renderMediaTable(); }
             } catch (e) {}
         }
@@ -822,11 +819,11 @@
             };
             
             const id = document.getElementById('edit_media_id').value;
-            await fetch(`http://localhost:3000/api/communications${id ? '/'+id : ''}`, { method: id ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            await fetch(`/api/communications${id ? '/'+id : ''}`, { method: id ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             document.getElementById('modalMedia').style.display = 'none'; showCustomToast('Hoàn tất!', 'Dữ liệu truyền thông đã được lưu.'); loadMedia();
         }
 
-        async function deleteMedia(id) { if(confirm("Xóa bài truyền thông này?")) { await fetch(`http://localhost:3000/api/communications/${id}`, { method: 'DELETE' }); loadMedia(); } }
+        async function deleteMedia(id) { if(confirm("Xóa bài truyền thông này?")) { await fetch(`/api/communications/${id}`, { method: 'DELETE' }); loadMedia(); } }
 
         window.onload = loadInitData;
     </script>

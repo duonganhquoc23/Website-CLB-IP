@@ -1,31 +1,20 @@
 const express = require('express');
-const mysql = require('mysql2/promise');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 
+// Kéo pool kết nối từ file db.js sang đây
+const pool = require('./db'); 
+
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
-// ================= CẤU HÌNH KẾT NỐI DATABASE AIVEN =================
-// Đọc file chứng chỉ SSL (Yêu cầu file ca.pem phải nằm cùng thư mục với server.js)
-const caCert = fs.readFileSync(path.join(__dirname, 'ca.pem'));
-
-const pool = mysql.createPool({
-    host: process.env.DB_HOST || 'mysql-297dc313-clbipkth-79ea.e.aivencloud.com', // ĐIỀN HOST AIVEN VÀO ĐÂY
-    port: process.env.DB_PORT || 19088,                               // ĐIỀN PORT AIVEN VÀO ĐÂY (thường là 19088)
-    user: process.env.DB_USER || 'avnadmin',
-    password: process.env.DB_PASSWORD || '', // ĐIỀN MẬT KHẨU AIVEN VÀO ĐÂY
-    database: process.env.DB_NAME || 'clb_ip_db',
-    dateStrings: true, // Giữ nguyên để không làm lỗi định dạng ngày tháng cũ của hệ thống
-    ssl: {
-        ca: caCert
-    }
-});
-// ====================================================================
+// ================= CẤU HÌNH GIAO DIỆN FRONTEND (RENDER) =================
+app.use(express.static(path.join(__dirname, 'public')));
+// =======================================================================
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -452,4 +441,4 @@ app.delete('/api/communications/:id', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server Backend CLB IP đang chạy tại http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Server Backend CLB IP đang chạy tại cổng ${PORT}`));

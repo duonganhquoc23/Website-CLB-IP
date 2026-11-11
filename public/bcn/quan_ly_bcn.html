@@ -172,7 +172,7 @@
 
         async function loadData() {
             try {
-                const res = await fetch('http://localhost:3000/api/board');
+                const res = await fetch('/api/board');
                 if(!res.ok) throw new Error();
                 allBoardData = await res.json();
                 
@@ -262,7 +262,7 @@
             document.getElementById('modalBoard').style.display = 'flex';
             
             try {
-                const res = await fetch('http://localhost:3000/api/members');
+                const res = await fetch('/api/members');
                 const members = await res.json();
                 const select = document.getElementById('thanh_vien_id');
                 select.innerHTML = '<option value="">-- Chọn thành viên --</option>';
@@ -283,7 +283,6 @@
                 document.getElementById('modalTitle').innerText = "Bổ Nhiệm Nhân Sự BCN";
                 document.getElementById('boardForm').reset();
                 const currentTerm = document.getElementById('termSelector').value;
-                // FIX LỖI 6: Xử lý giá trị mặc định cho ô nhiệm kỳ, tránh lưu chữ "Chưa có dữ liệu"
                 if(currentTerm && currentTerm !== 'Chưa có dữ liệu' && currentTerm !== '') {
                     document.getElementById('nhiem_ky').value = currentTerm;
                 } else {
@@ -299,7 +298,7 @@
                 nhiem_ky: document.getElementById('nhiem_ky').value, thanh_vien_id: document.getElementById('thanh_vien_id').value,
                 chuc_vu: document.getElementById('chuc_vu').value, ban_phu_trach: document.getElementById('ban_phu_trach').value
             };
-            const url = currentEditId ? `http://localhost:3000/api/board/${currentEditId}` : 'http://localhost:3000/api/board';
+            const url = currentEditId ? `/api/board/${currentEditId}` : '/api/board';
             const method = currentEditId ? 'PUT' : 'POST';
 
             try {
@@ -310,7 +309,7 @@
 
         async function deleteBoardMember(id) {
             if(confirm("Bạn có chắc chắn muốn xóa thành viên này khỏi Ban Chủ nhiệm?")) {
-                try { await fetch(`http://localhost:3000/api/board/${id}`, { method: 'DELETE' }); loadData(); } catch (err) { alert('Lỗi khi xóa!'); }
+                try { await fetch(`/api/board/${id}`, { method: 'DELETE' }); loadData(); } catch (err) { alert('Lỗi khi xóa!'); }
             }
         }
 

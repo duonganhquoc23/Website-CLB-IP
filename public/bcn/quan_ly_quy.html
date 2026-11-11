@@ -108,7 +108,6 @@
         </div>
     </div>
 
-    <!-- Modals -->
     <div class="modal" id="modalCreateFund">
         <div class="modal-content">
             <div class="modal-header">
@@ -153,7 +152,7 @@
 
         async function loadMembers() {
             try {
-                const res = await fetch('http://localhost:3000/api/members');
+                const res = await fetch('/api/members');
                 if (res.ok) {
                     allMembers = await res.json();
                     const select = $('#entry_member');
@@ -166,19 +165,17 @@
 
         async function loadFunds() {
             try {
-                // Tải trạng thái khóa quỹ từ Database Server (Fix lỗi 1)
-                const resSet = await fetch('http://localhost:3000/api/settings/locked_funds');
+                const resSet = await fetch('/api/settings/locked_funds');
                 if(resSet.ok) {
                     const setObj = await resSet.json();
                     if(setObj.gia_tri) lockedFundsList = JSON.parse(setObj.gia_tri);
                 }
 
-                const resFunds = await fetch('http://localhost:3000/api/funds');
+                const resFunds = await fetch('/api/funds');
                 if (resFunds.ok) {
                     const flatFunds = await resFunds.json();
                     let grouped = {};
                     flatFunds.filter(f => f.loai_gd === 'Thu').forEach(f => {
-                        // Nhóm quỹ bằng Tên + Ngày để tránh gộp sai khi trùng tên (Fix lỗi 2)
                         let groupKey = f.noi_dung + '|' + f.ngay_gd;
                         if (!grouped[groupKey]) grouped[groupKey] = { ten_quy: f.noi_dung, ngay_thu: f.ngay_gd, groupKey: groupKey, entries: [] };
                         grouped[groupKey].entries.push({ id: f.id, member_name: f.nguoi_thuc_hien, amount: f.so_tien, method: f.ghi_chu.split(' - ')[0], note: f.ghi_chu.split(' - ')[1] || '' });
@@ -260,7 +257,7 @@
             });
 
             try {
-                const resPlans = await fetch('http://localhost:3000/api/plans');
+                const resPlans = await fetch('/api/plans');
                 if (resPlans.ok) {
                     const plans = await resPlans.json();
                     plans.filter(p => p.tong_kinh_phi > 0).forEach(plan => {
@@ -280,7 +277,7 @@
             document.getElementById('totalPrograms').innerText = document.querySelectorAll('.fund-card').length;
 
             try {
-                const resDash = await fetch('http://localhost:3000/api/dashboard');
+                const resDash = await fetch('/api/dashboard');
                 if (resDash.ok) {
                     const dData = await resDash.json();
                     const balEl = document.getElementById('globalBalance');
@@ -293,7 +290,7 @@
 
         async function syncLockState() {
             try {
-                await fetch('http://localhost:3000/api/settings/locked_funds', {
+                await fetch('/api/settings/locked_funds', {
                     method: 'PUT', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ gia_tri: JSON.stringify(lockedFundsList) })
                 });
@@ -370,7 +367,7 @@
                 if (fund) {
                     try {
                         const deletePromises = fund.entries.map(entry => 
-                            fetch(`http://localhost:3000/api/funds/${entry.id}`, { method: 'DELETE' })
+                            fetch(`/api/funds/${entry.id}`, { method: 'DELETE' })
                         );
                         await Promise.all(deletePromises);
                         await loadFunds();
@@ -388,7 +385,6 @@
             const newAmount = Number(document.getElementById('entry_amount').value);
             
             if (!mssv) { return Swal.fire({ icon: 'warning', title: 'Thiếu thông tin', text: 'Vui lòng chọn người nộp!' }); }
-            // Fix số âm
             if(newAmount <= 0) { return Swal.fire({ icon: 'warning', title: 'Lỗi Logic', text: 'Số tiền đóng phải lớn hơn 0 VNĐ!' }); }
             
             let hoTen = "Unknown";
@@ -434,7 +430,7 @@
             }
 
             try {
-                const response = await fetch('http://localhost:3000/api/funds', {
+                const response = await fetch('/api/funds', {
                     method: 'POST', headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         ngay_gd: dateQuy || new Date().toISOString().split('T')[0], loai_gd: 'Thu',
@@ -468,7 +464,7 @@
 
             if (confirmResult.isConfirmed) {
                 try {
-                    await fetch(`http://localhost:3000/api/funds/${id}`, { method: 'DELETE' }); 
+                    await fetch(`/api/funds/${id}`, { method: 'DELETE' }); 
                     await loadFunds();
                     Swal.fire({ icon: 'success', title: 'Đã xóa!', timer: 1500, showConfirmButton: false });
                 } catch(e) {
