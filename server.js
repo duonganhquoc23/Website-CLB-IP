@@ -14,6 +14,10 @@ app.use(express.json({ limit: '10mb' }));
 
 // ================= CẤU HÌNH GIAO DIỆN FRONTEND (RENDER) =================
 app.use(express.static(path.join(__dirname, 'public')));
+// Cấu hình khi người dùng vào link gốc thì tự động chuyển đến trang chủ
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'trang_chu.html'));
+});
 // =======================================================================
 
 const storage = multer.diskStorage({
