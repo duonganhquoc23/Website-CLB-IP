@@ -12,13 +12,27 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
-// ================= CẤU HÌNH GIAO DIỆN FRONTEND (RENDER) =================
+// ================= CẤU HÌNH GIAO DIỆN FRONTEND & ROUTE THÀNH VIÊN (RENDER) =================
 app.use(express.static(path.join(__dirname, 'public')));
-// Cấu hình khi người dùng vào link gốc thì tự động chuyển đến trang chủ
+
+// Định tuyến trang chủ quản trị (Admin)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'trang_chu.html'));
 });
-// =======================================================================
+
+// Định tuyến riêng cho các trang của thành viên trong thư mục thanhvien
+app.get('/thanh_vien/trang_chu_tv.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'thanhvien', 'trang_chu_tv.html'));
+});
+
+app.get('/thanh_vien/diem_danh_tv.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'thanhvien', 'diem_danh_tv.html'));
+});
+
+app.get('/thanh_vien/tai_lieu_tv.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'thanhvien', 'tai_lieu_tv.html'));
+});
+// =======================================================================================
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -56,6 +70,7 @@ app.get('/api/dashboard', async (req, res) => {
         const [tv] = await pool.query('SELECT COUNT(*) as total_tv FROM thanh_vien');
         const [tl] = await pool.query('SELECT COUNT(*) as total_tl FROM tai_lieu');
         
+        // Đã sửa dấu ngoặc kép thành nháy đơn chuẩn SQL
         const [thu] = await pool.query("SELECT SUM(so_tien) as total FROM quy_clb WHERE loai_gd = 'Thu'");
         const [chi] = await pool.query("SELECT SUM(so_tien) as total FROM quy_clb WHERE loai_gd = 'Chi'");
         const [kh] = await pool.query('SELECT SUM(tong_kinh_phi) as total FROM ke_hoach_sinh_hoat');
@@ -289,6 +304,7 @@ app.post('/api/attendance', async (req, res) => {
     const connection = await pool.getConnection();
     try {
         await connection.beginTransaction();
+        // Đã sửa dấu ngoặc kép thành nháy đơn chuẩn SQL
         const [dot] = await connection.query("INSERT INTO dot_diem_danh (ten_hoat_dong, thoi_gian, ban_kinh, vi_do, kinh_do, trang_thai) VALUES (?, ?, ?, ?, ?, 'Đang mở')", [ten_hoat_dong, thoi_gian, ban_kinh, vi_do, kinh_do]);
         const [members] = await connection.query("SELECT mssv FROM thanh_vien WHERE trang_thai_hd = 'Đang hoạt động'");
         if (members.length > 0) {
