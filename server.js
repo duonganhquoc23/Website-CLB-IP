@@ -56,8 +56,8 @@ app.get('/api/dashboard', async (req, res) => {
         const [tv] = await pool.query('SELECT COUNT(*) as total_tv FROM thanh_vien');
         const [tl] = await pool.query('SELECT COUNT(*) as total_tl FROM tai_lieu');
         
-        const [thu] = await pool.query('SELECT SUM(so_tien) as total FROM quy_clb WHERE loai_gd = "Thu"');
-        const [chi] = await pool.query('SELECT SUM(so_tien) as total FROM quy_clb WHERE loai_gd = "Chi"');
+        const [thu] = await pool.query("SELECT SUM(so_tien) as total FROM quy_clb WHERE loai_gd = 'Thu'");
+        const [chi] = await pool.query("SELECT SUM(so_tien) as total FROM quy_clb WHERE loai_gd = 'Chi'");
         const [kh] = await pool.query('SELECT SUM(tong_kinh_phi) as total FROM ke_hoach_sinh_hoat');
         
         const totalThu = parseFloat(thu[0].total || 0);
@@ -289,9 +289,8 @@ app.post('/api/attendance', async (req, res) => {
     const connection = await pool.getConnection();
     try {
         await connection.beginTransaction();
-        const [dot] = await connection.query('INSERT INTO dot_diem_danh (ten_hoat_dong, thoi_gian, ban_kinh, vi_do, kinh_do, trang_thai) VALUES (?, ?, ?, ?, ?, "Đang mở")', [ten_hoat_dong, thoi_gian, ban_kinh, vi_do, kinh_do]);
-        
-        const [members] = await connection.query('SELECT mssv FROM thanh_vien WHERE trang_thai_hd = "Đang hoạt động"');
+        const [dot] = await connection.query("INSERT INTO dot_diem_danh (ten_hoat_dong, thoi_gian, ban_kinh, vi_do, kinh_do, trang_thai) VALUES (?, ?, ?, ?, ?, 'Đang mở')", ...);
+        const [members] = await connection.query("SELECT mssv FROM thanh_vien WHERE trang_thai_hd = 'Đang hoạt động'");
         if (members.length > 0) {
             const values = members.map(m => [dot.insertId, m.mssv, 'Vắng']);
             await connection.query('INSERT INTO chi_tiet_diem_danh (dot_id, mssv, trang_thai) VALUES ?', [values]);
