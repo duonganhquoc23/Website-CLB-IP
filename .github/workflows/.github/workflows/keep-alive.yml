@@ -1,0 +1,15 @@
+name: Keep Server Alive
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping main page
+        run: |
+          curl -X GET https://website-clb-ip.onrender.com/trang_chu.html
+          echo "Server is awake!"
